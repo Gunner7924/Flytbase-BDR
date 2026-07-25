@@ -20,9 +20,20 @@ An autonomous **AI Outbound BDR (Business Development Representative) Assistant*
 
 ---
 
-## 🔄 n8n / LangChain Backend Workflow Architecture
+## 📥 Import n8n Workflow JSON
 
-The application is synchronized with an **n8n multi-agent execution pipeline**:
+The exact n8n backend workflow schema shown in the diagram is published in the repository under [`n8n/n8n-workflow.json`](./n8n/n8n-workflow.json).
+
+### How to Import into your n8n Instance:
+1. Open your **n8n Editor UI**.
+2. Click on the top-right **`Workflows`** menu ➔ Select **`Import from File`** (or press `Ctrl + O` / `Cmd + O`).
+3. Select the [`n8n/n8n-workflow.json`](./n8n/n8n-workflow.json) file from this repository.
+4. Add your **OpenAI API Key** credential to the `OpenAI Model` nodes.
+5. Click **`Activate`** — your webhook endpoint will be live at `https://YOUR_N8N_DOMAIN/webhook/bdr-campaign`!
+
+---
+
+## 🔄 n8n / LangChain Backend Workflow Architecture
 
 ```mermaid
 graph LR
@@ -86,7 +97,7 @@ graph LR
 
 You can connect the frontend directly to your self-hosted n8n instance or custom webhook endpoint:
 1. Click the **Webhook Settings** button in the top navigation bar.
-2. Enter your n8n Webhook URL (e.g., `https://n8n.yourdomain.com/webhook/outbound-bdr`).
+2. Enter your n8n Webhook URL (e.g., `https://n8n.yourdomain.com/webhook/bdr-campaign`).
 3. (Optional) Provide your API authorization key.
 4. Save configuration — all campaign requests will POST directly to your live workflow pipeline!
 
