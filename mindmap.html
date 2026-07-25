@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Outbound BDR Assistant - Interactive Mind Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(16, 23, 38, 0.85);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-violet: #8b5cf6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+      background-attachment: fixed;
+      overflow-x: auto;
+      padding: 30px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      font-size: 0.95rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Mindmap Container */
+    .mindmap-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Tree Layout */
+    .tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .node-central {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      color: #fff;
+      padding: 20px 36px;
+      border-radius: 20px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      text-align: center;
+      z-index: 10;
+      margin-bottom: 50px;
+      transition: transform 0.3s ease;
+    }
+
+    .node-central:hover {
+      transform: scale(1.05);
+    }
+
+    .branches-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      width: 100%;
+      max-width: 1300px;
+    }
+
+    .branch-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .branch-card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .branch-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .branch-1 .branch-title { color: var(--accent-indigo); }
+    .branch-2 .branch-title { color: var(--accent-cyan); }
+    .branch-3 .branch-title { color: var(--accent-emerald); }
+    .branch-4 .branch-title { color: var(--accent-amber); }
+    .branch-5 .branch-title { color: var(--accent-violet); }
+    .branch-6 .branch-title { color: var(--accent-rose); }
+
+    .subnodes {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .subnode-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .subnode-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .subnode-label {
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    .subnode-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .badge-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, 0.18);
+      color: var(--accent-indigo);
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🛸 AI Outbound BDR Assistant Architecture</h1>
+    <p class="subtitle">Interactive System Mind Map & n8n Pipeline Flow</p>
+  </header>
+
+  <div class="mindmap-container">
+    <div class="tree">
+      
+      <!-- Central Root Node -->
+      <div class="node-central">
+        🚁 AI Outbound BDR Assistant
+        <div style="font-size: 0.85rem; font-weight: 500; opacity: 0.9; margin-top: 4px;">
+          FlytBase & Drone Ecosystem Platform
+        </div>
+      </div>
+
+      <!-- 6 Main Feature & Architecture Branches -->
+      <div class="branches-grid">
+        
+        <!-- Branch 1: Campaign Builder -->
+        <div class="branch-card branch-1">
+          <div class="branch-title">🎯 1. Campaign Builder</div>
+          <ul class="subnodes">
+            <li class="subnode-item">
+              <span class="subnode-label">Industry Selector</span>
+              <span class="subnode-desc">Autonomous Drones & Aerial Robotics (UAS), B2B SaaS, FinTech, CyberSecurity</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Reference Company</span>
+              <span class="subnode-desc">FlytBase (Default), Skydio, Zipline, DroneDeploy, ideaForge</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Country Filter</span>
+              <span class="subnode-desc">India, United States, UK, Germany, Japan, UAE, France</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Target Count Slider</span>
+              <span class="subnode-desc">3 to 20 Lookalike Prospects Generator</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Branch 2: Target Companies Directory -->
+        <div class="branch-card branch-2">
+          <div class="branch-title">📊 2. Target Companies Table</div>
+          <ul class="subnodes">
+            <li class="subnode-item">
+              <span class="subnode-label">Company Metadata</span>
+              <span class="subnode-desc">Domain Links, Region, Match Score %</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Live Status Badges</span>
+              <span class="subnode-desc">Discovered ➔ Researched ➔ Email Ready ➔ Approved</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Individual & Bulk Triggers</span>
+              <span class="subnode-desc">[Research] single lead or [Research All] batch execution</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Filter & Search</span>
+              <span class="subnode-desc">Real-time keyword search & status filter</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Branch 3: Company Intelligence Inspector -->
+        <div class="branch-card branch-3">
+          <div class="branch-title">🔬 3. Company Intelligence</div>
+          <ul class="subnodes">
+            <li class="subnode-item">
+              <span class="subnode-label">Summary & Elevator Pitch</span>
+              <span class="subnode-desc">FlytBase autonomous drone dock platform overview</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Products & Tech Stack</span>
+              <span class="subnode-desc">FlytNow OS, FlytCloud Edge Link, BVLOS Safety Suite</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Pain Points & Signals</span>
+              <span class="subnode-desc">DGCA/FAA BVLOS clearance delays, 5G video telemetry latency</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Decision Maker Persona</span>
+              <span class="subnode-desc">Nitin Gupta (Founder & CEO, Pune, India)</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Lead Fit Score</span>
+              <span class="subnode-desc">0-100 Weighted ICP score meter</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Branch 4: Generated Email Studio -->
+        <div class="branch-card branch-4">
+          <div class="branch-title">✉️ 4. Email Generation Studio</div>
+          <ul class="subnodes">
+            <li class="subnode-item">
+              <span class="subnode-label">Tone Selector Switch</span>
+              <span class="subnode-desc">Consultative, Direct & Short, Value-First, Friendly Intro</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Editable Subject & Body</span>
+              <span class="subnode-desc">Direct text editor with personalized merge tags</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Action Controls</span>
+              <span class="subnode-desc">[Copy to Clipboard], [Regenerate], [Approve & Sync]</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Branch 5: n8n Backend Workflow Pipeline -->
+        <div class="branch-card branch-5">
+          <div class="branch-title">⚡ 5. n8n Multi-Agent Workflow</div>
+          <ul class="subnodes">
+            <li class="subnode-item">
+              <span class="subnode-label">1. Webhook</span>
+              <span class="subnode-desc">POST /webhook/bdr-campaign</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">2. Find Companies Agent</span>
+              <span class="subnode-desc">OpenAI gpt-4o-mini + Buffer Memory</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">3. Loop & Analysis Agent</span>
+              <span class="subnode-desc">Extracts BVLOS pain points & decision makers</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">4. Lead Qualification & Scoring</span>
+              <span class="subnode-desc">Calculates ICP fit score & outreach draft</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">5. Create Excel & Respond</span>
+              <span class="subnode-desc">Generates CSV export & HTTP 200 payload</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Branch 6: Campaign Metrics & Export -->
+        <div class="branch-card branch-6">
+          <div class="branch-title">📈 6. Status & Export</div>
+          <ul class="subnodes">
+            <li class="subnode-item">
+              <span class="subnode-label">Companies Found Metric</span>
+              <span class="subnode-desc">Total prospective accounts discovered</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Research Progress Bar</span>
+              <span class="subnode-desc">% of leads fully qualified</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Emails Ready Counter</span>
+              <span class="subnode-desc">Count of approved outreach sequences</span>
+            </li>
+            <li class="subnode-item">
+              <span class="subnode-label">Spreadsheet Export</span>
+              <span class="subnode-desc">One-click .CSV sequence download</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    AI Outbound BDR Assistant Architecture &bull; Published on GitHub repository <a href="https://github.com/Gunner7924/Flytbase-BDR" target="_blank" style="color: var(--accent-cyan);">Gunner7924/Flytbase-BDR</a>
+  </footer>
+
+</body>
+</html>
